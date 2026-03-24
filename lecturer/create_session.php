@@ -95,8 +95,8 @@ echo "<script>showToast('Session Created Successfully');</script>";
 </head>
 <body>
 
+<?php include "navbar.php"; ?>
 <h2>Create Attendance Session</h2>
-
 <p><?php echo $message; ?></p>
 <div class="container">
     <div class="card">
