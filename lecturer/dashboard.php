@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $expiry
         ]);
 
-        $attendanceURL = "http://192.168.137.1/attendance_system/student/mark_attendance.php?token=" . $token;
+        $attendanceURL = "http://192.168.137.1/attendance_system/student/mark_attendance.php?session_id=" . $session_id;
 
         $qrPath = "../qrcodes/" . $token . ".png";
         QRcode::png($attendanceURL, $qrPath);
@@ -41,16 +41,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-
-<h2>Welcome, <?php echo $_SESSION["lecturer_name"]; ?></h2>
-
-<form method="POST" id="sessionForm">
-    <input type="hidden" name="lat" id="lat">
+<?php include "navbar.php"; ?>
+<div class="container">
+    
+    <h2>Welcome, <?php echo $_SESSION["lecturer_name"]; ?></h2>
+    <div class="card">
+        <a class="button" href="courses.php">Manage Courses</a>
+    </div>
+<!-- 
+    <form method="POST" id="sessionForm">
+        <input type="hidden" name="lat" id="lat">
     <input type="hidden" name="lon" id="lon">
     <button type="button" onclick="createSession()">Create Attendance Session</button>
 </form>
@@ -60,10 +68,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php if ($qrPath != ""): ?>
     <h3>Scan QR Code:</h3>
     <img src="<?php echo $qrPath; ?>">
-<?php endif; ?>
+    <?php endif; ?>
+    -->
+    
 
-<br><br>
-<a href="logout.php">Logout</a>
+    <br><br>
+<a class="button" href="logout.php">Logout</a>
+</div>
 
 <script>
 function createSession() {
@@ -78,6 +89,6 @@ function createSession() {
     }
 }
 </script>
-
+<script src="../assets/js/main.js"></script>
 </body>
 </html>

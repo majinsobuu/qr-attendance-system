@@ -1,0 +1,232 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: auto;
+    text-align: center;
+    background: #f5f7fb;
+}
+
+/* buttons */
+.button {
+    transition: 0.3s ease;
+}
+/* BASE BUTTON */
+.button  {
+    display: inline-block;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* PRIMARY (Default Blue) */
+.button-primary {
+    background: #007bff;
+    color: white;
+}
+
+.button-primary:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+/* SUCCESS (Green) */
+.button-success {
+    background: #28a745;
+    color: white;
+}
+
+.button-success:hover {
+    background: #1e7e34;
+    transform: translateY(-2px);
+}
+
+/* DANGER (Red) */
+.button-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.button-danger:hover {
+    background: #a71d2a;
+    transform: translateY(-2px);
+}
+
+/* WARNING (Orange) */
+.button-warning {
+    background: #ffc107;
+    color: black;
+}
+
+.button-warning:hover {
+    background: #e0a800;
+    transform: translateY(-2px);
+}
+
+/* SECONDARY (Gray) */
+.button-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.button-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+/* SMALL BUTTON */
+.button-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* FULL WIDTH (FOR MOBILE) */
+.button-block {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+/* ICON SPACING */
+.button i {
+    margin-right: 5px;
+}
+
+/* NAVBAR */
+.navbar {
+    background: #111;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    color: white;
+    margin-right: 15px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    color: #00d4ff;
+}
+
+/* CONTAINER */
+.container {
+    padding: 20px;
+}
+
+.page-center {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(120deg, rgba(15, 23, 42, 0.95), rgba(7, 12, 26, 0.9));
+}
+
+.page-center .container {
+    width: min(920px, 96vw);
+    padding: 1.25rem;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    box-shadow: 0 22px 34px rgba(3, 12, 26, 0.62);
+    background: rgba(8, 16, 30, 0.83);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+    width: 20%;
+    padding: 0.8rem 0.95rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(148, 163, 184, 0.32);
+    background: rgba(211, 217, 232, 0.74);
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
+
+/* CARDS */
+.card {
+    align-content: center;
+    width: auto;
+    background: rgb(245, 247, 251);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+
+}
+
+/* BUTTONS */
+.button {
+    background: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.button:hover {
+    background: #0056b3;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th {
+    background: #222;
+    color: white;
+}
+
+td, th {
+    padding: 12px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+}

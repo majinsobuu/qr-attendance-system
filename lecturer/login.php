@@ -53,24 +53,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecturer Login</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <h2>Lecturer Login</h2>
 
-    <?php if ($message != "") echo "<p>$message</p>"; ?>
+    <div class="card">
+        <?php if ($message != "") echo "<p>$message</p>"; ?>
+    
 
     <form method="POST">
         <label>Email or Phone:</label><br>
         <input type="text" name="identifier"><br><br>
 
     <label>Password:</label><br>
-    <input type="password" name="password" id="password"><br>
-    <button type="button" id="togglePassword">Show</button><br><br>
+    <input type="password" name="password" id="password">
+    <button class= "button" type="button" id="togglePassword">Show</button><br><br>
 
-    <button type="submit">Login</button>
+    <button class= "button" type="submit">Login</button>
     </form>
-
+</div>
     <p>Don't have an account? <a href="register.php">Register here</a></p>
+    <script src="../assets/script.js"></script>
     <script>
     // Toggle password visibility for the login form
     document.addEventListener('DOMContentLoaded', function () {
@@ -85,6 +89,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
     });
     </script>
-
 </body>
 </html>

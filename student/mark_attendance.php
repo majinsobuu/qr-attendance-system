@@ -21,12 +21,14 @@ $message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $matric = trim($_POST["matric"]);
+    $student_name = trim($_POST["student_name"]);
+    $student_level = trim($_POST["student_level"]);
     $student_lat = $_POST["lat"];
     $student_lon = $_POST["lon"];
     $device_id = $_POST["device_id"];
 
-    if (empty($matric)) {
-        $message = "Matric number required.";
+    if (empty($matric) || empty($student_name) || empty($student_level)) {
+        $message = "All fields are required.";
     }
     elseif (empty($student_lat) || empty($student_lon)) {
         $message = "Location access required.";
@@ -86,11 +88,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 else {
 
                     // Insert attendance
-                    $insert = $pdo->prepare("INSERT INTO attendance (session_id, matric_no, device_id, student_lat, student_lon, distance)
-                    VALUES (?, ?, ?, ?, ?, ?)");
-
+                    $insert = $pdo->prepare("INSERT INTO attendance (session_id, student_name, student_level, matric_no, device_id, student_lat, student_lon, distance)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     $insert->execute([
                         $session_id,
+                        $student_name,
+                        $student_level,
                         $matric,
                         $device_id,
                         $student_lat,
@@ -107,30 +110,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Mark Attendance</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 
-<h2>Mark Attendance</h2>
 
 <?php if ($message != ""): ?>
     <p><strong><?php echo $message; ?></strong></p>
 <?php endif; ?>
 
+<div class="container">
+    <div class="card">
 <form method="POST" id="attendanceForm" 
 onsubmit="event.preventDefault(); submitAttendance();">
 
-    <input type="text" name="matric" placeholder="Enter Matric Number" required><br><br>
+    <input type="text" name="matric" placeholder="Matric Number" required><br><br>
+
+    <input type="text" name="student_name" placeholder="Full Name" required><br><br>
+
+    <input type="text" name="student_level" placeholder="Level (e.g. 300)" required><br><br>
 
     <input type="hidden" name="lat" id="lat">
     <input type="hidden" name="lon" id="lon">
     <input type="hidden" name="device_id" id="device_id">
 
-    <button type="submit">Submit Attendance</button>
+    <button class="button" type="submit">Submit Attendance</button>
 </form>
+</div>
+</div>
 
+<script src="../assets/script.js"></script>
 <script>
 function submitAttendance() {
 
@@ -165,6 +180,5 @@ function submitAttendance() {
     );
 }
 </script>
-
 </body>
 </html>

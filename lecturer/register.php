@@ -42,10 +42,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecturer Registration</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <h2>Lecturer Registration</h2>
-
+    <div class="card">
     <?php 
         if ($message != "") echo "<p>$message</p>";
     ?>
@@ -53,27 +54,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="POST">
         <label>First Name:</label><br>
         <input type="text" name="first_name"><br><br>
-
+        
         <label>Last Name:</label><br>
         <input type="text" name="last_name"><br><br>
 
         <label>Email:</label><br>
         <input type="email" name="email"><br><br>
-
+        
         <label>Phone Number:</label><br>
         <input type="text" name="phone_number"><br><br>
-
+        
         <label>Password:</label><br>
-        <input type="password" name="password" id="password"><br>
-        <button type="button" id="togglePassword">Show</button><br><br>
+        <input type="password" name="password" id="password">
+        <button class="button" type="button" id="togglePassword">Show</button><br><br></input>
+        
+    <button class="button" type="submit">Register</button>
+</form>
+</div>
 
-    <button type="submit">Register</button>
-    </form>
-
-    <p>Already have an account? <a href="login.php">Login here</a></p>
-</body>
-</html>
-
+<p>Already have an account? <a href="login.php">Login here</a></p>
 <script>
 // Toggle password visibility for the registration form
 document.addEventListener('DOMContentLoaded', function () {
@@ -88,5 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+</body>
+</html>
 
 
