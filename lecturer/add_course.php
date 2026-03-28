@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php include "navbar.php"; ?>
 <div class="container">
 <p><?php echo $message; ?></p>
-<div class="card
+<div class="card">
 <form method="POST">
     <input type="text" name="course_code" placeholder="Course Code"><br><br>
     <input type="text" name="course_title" placeholder="Course Title"><br><br>

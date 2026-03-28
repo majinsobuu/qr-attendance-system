@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type='hidden' name='end_session_id' value='$session_id'>
                     <button class='button' type='submit'>End Session and Go to Course Dashboard</button>
                 </form>
-                <p><a class='button' href='$viewattendanceURL'>View Attendance Records</a></p>
+                <p><a class='button' target='_blank' href='$viewattendanceURL'>View Attendance Records</a></p>
 
             ";
         }

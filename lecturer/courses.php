@@ -29,7 +29,7 @@ $courses = $stmt->fetchAll();
     
     <h2>My Courses</h2>
     
-    <a href="add_course.php">+ Add New Course</a><br><br>
+    <a class="button" href="add_course.php">+ Add New Course</a><br><br>
     
     <div class="card">
     <table border="1" cellpadding="10">
@@ -44,7 +44,7 @@ $courses = $stmt->fetchAll();
     <td><?php echo $course["course_code"]; ?></td>
     <td><?php echo $course["course_title"]; ?></td>
     <td>
-        <a href="course_dashboard.php?course_id=<?php echo $course["course_id"]; ?>">
+        <a class="button" href="course_dashboard.php?course_id=<?php echo $course["course_id"]; ?>">
             Manage
         </a>
     </td>
