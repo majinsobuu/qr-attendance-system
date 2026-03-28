@@ -150,7 +150,7 @@ select {
     border-radius: 0.9rem;
     border: 1px solid rgba(148, 163, 184, 0.32);
     background: rgba(211, 217, 232, 0.74);
-    color: #e2e8f0;
+    color: #000000;
     font-size: 0.95rem;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
