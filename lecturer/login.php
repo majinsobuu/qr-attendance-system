@@ -52,40 +52,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lecturer Login</title>
+    <title>Lecturer Login - QR Attend</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h2>Lecturer Login</h2>
+    <div class="page-center">
+        <!-- Main Form Container -->
+        <div style="width: 100%; max-width: 400px; text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--accent-glow); margin-bottom: 0.5rem; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h2>Lecturer Login</h2>
+            <p>Welcome back! Please login to your account.</p>
+        </div>
 
-    <div class="card">
-        <?php if ($message != "") echo "<p>$message</p>"; ?>
-    
+        <div class="card" style="width: 100%; max-width: 400px;">
+            <?php if ($message != "") echo "<div class='badge' style='background: rgba(239, 68, 68, 0.2); color: var(--danger); text-align: center; margin-bottom: 1rem;'>$message</div>"; ?>
 
-    <form method="POST">
-        <label>Email or Phone:</label><br>
-        <input type="text" name="identifier"><br><br>
+            <form method="POST">
+                
+                <label for="identifier"><i class="fa-solid fa-user" style="margin-right: 5px;"></i> Email or Phone</label>
+                <input type="text" name="identifier" id="identifier" placeholder="Enter your email or phone..." required>
 
-    <label>Password:</label><br>
-    <input type="password" name="password" id="password">
-    <button class= "button" type="button" id="togglePassword">Show</button><br><br>
+                <label for="password" style="margin-top: 0.5rem;"><i class="fa-solid fa-lock" style="margin-right: 5px;"></i> Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Enter password..." required>
+                    <button class="password-toggle" type="button" id="togglePassword"><i class="fa-solid fa-eye"></i></button>
+                </div>
 
-    <button class= "button" type="submit">Login</button>
-    </form>
-</div>
-    <p>Don't have an account? <a href="register.php">Register here</a></p>
-    <script src="../assets/script.js"></script>
+                <button class="button button-primary" type="submit" style="margin-top: 1rem; width: 100%;"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+            </form>
+        </div>
+
+        <p class="mt-4" style="text-align: center;">Don't have an account? <a href="register.php" style="font-weight: 600;">Register here <i class="fa-solid fa-arrow-right"></i></a></p>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
     <script>
     // Toggle password visibility for the login form
     document.addEventListener('DOMContentLoaded', function () {
         var toggle = document.getElementById('togglePassword');
         var pwd = document.getElementById('password');
+        var icon = toggle.querySelector('i');
         if (!toggle || !pwd) return;
 
         toggle.addEventListener('click', function () {
             var type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
             pwd.setAttribute('type', type);
-            toggle.textContent = type === 'password' ? 'Show' : 'Hide';
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
         });
     });
     </script>

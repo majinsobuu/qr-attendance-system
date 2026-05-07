@@ -41,52 +41,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lecturer Registration</title>
+    <title>Lecturer Registration - QR Attend</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h2>Lecturer Registration</h2>
-    <div class="card">
-    <?php 
-        if ($message != "") echo "<p>$message</p>";
-    ?>
+    <div class="page-center">
+        <!-- Main Form Container -->
+        <div style="width: 100%; max-width: 450px; text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--accent-glow); margin-bottom: 0.5rem; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2>Create an Account</h2>
+            <p>Join us to start taking attendance with ease.</p>
+        </div>
 
-    <form method="POST">
-        <label>First Name:</label><br>
-        <input type="text" name="first_name"><br><br>
-        
-        <label>Last Name:</label><br>
-        <input type="text" name="last_name"><br><br>
+        <div class="card" style="width: 100%; max-width: 450px;">
+            <?php if ($message != "") echo "<div class='badge' style='background: rgba(14, 165, 233, 0.2); color: var(--accent-glow); text-align: center; margin-bottom: 1rem;'>$message</div>"; ?>
 
-        <label>Email:</label><br>
-        <input type="email" name="email"><br><br>
-        
-        <label>Phone Number:</label><br>
-        <input type="text" name="phone_number"><br><br>
-        
-        <label>Password:</label><br>
-        <input type="password" name="password" id="password">
-        <button class="button" type="button" id="togglePassword">Show</button><br><br></input>
-        
-    <button class="button" type="submit">Register</button>
-</form>
-</div>
+            <form method="POST">
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label for="first_name"><i class="fa-solid fa-address-card" style="margin-right: 5px;"></i> First Name</label>
+                        <input type="text" name="first_name" id="first_name" placeholder="John" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="last_name"><i class="fa-solid fa-address-card" style="margin-right: 5px;"></i> Last Name</label>
+                        <input type="text" name="last_name" id="last_name" placeholder="Doe" required>
+                    </div>
+                </div>
 
-<p>Already have an account? <a href="login.php">Login here</a></p>
-<script>
-// Toggle password visibility for the registration form
-document.addEventListener('DOMContentLoaded', function () {
-    var toggle = document.getElementById('togglePassword');
-    var pwd = document.getElementById('password');
-    if (!toggle || !pwd) return;
+                <label for="email" style="margin-top: 0.5rem;"><i class="fa-solid fa-envelope" style="margin-right: 5px;"></i> Email Address</label>
+                <input type="email" name="email" id="email" placeholder="john.doe@example.com" required>
+                
+                <label for="phone_number" style="margin-top: 0.5rem;"><i class="fa-solid fa-phone" style="margin-right: 5px;"></i> Phone Number</label>
+                <input type="text" name="phone_number" id="phone_number" placeholder="+1234567890" required>
 
-    toggle.addEventListener('click', function () {
-        var type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
-        pwd.setAttribute('type', type);
-        toggle.textContent = type === 'password' ? 'Show' : 'Hide';
+                <label for="password" style="margin-top: 0.5rem;"><i class="fa-solid fa-lock" style="margin-right: 5px;"></i> Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Create a password..." required>
+                    <button class="password-toggle" type="button" id="togglePassword"><i class="fa-solid fa-eye"></i></button>
+                </div>
+                
+                <button class="button button-success" type="submit" style="margin-top: 1rem; width: 100%;"><i class="fa-solid fa-check-circle"></i> Register Now</button>
+            </form>
+        </div>
+
+        <p class="mt-4" style="text-align: center;">Already have an account? <a href="login.php" style="font-weight: 600;">Login here <i class="fa-solid fa-arrow-right"></i></a></p>
+    </div>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+    // Toggle password visibility for the registration form
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggle = document.getElementById('togglePassword');
+        var pwd = document.getElementById('password');
+        var icon = toggle.querySelector('i');
+        if (!toggle || !pwd) return;
+
+        toggle.addEventListener('click', function () {
+            var type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwd.setAttribute('type', type);
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
     });
-});
-</script>
+    </script>
 </body>
 </html>
 

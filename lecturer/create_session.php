@@ -13,17 +13,6 @@ if (!isset($_GET["course_id"])) {
 $course_id = $_GET["course_id"];
 $message = "";
 
-// End session action from the End Session button (redirect to course dashboard)
-if (isset($_GET["end_session_id"])) {
-    $end_session_id = intval($_GET["end_session_id"]);
-
-    $stmt = $pdo->prepare("UPDATE sessions SET expires_at = NOW() WHERE session_id = ? AND lecturer_id = ?");
-    $stmt->execute([$end_session_id, $_SESSION["lecturer_id"]]);
-
-    header("Location: course_dashboard.php?course_id=" . $course_id);
-    exit;
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $lecturer_lat = $_POST["lat"];
@@ -41,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ");
         
         $lecturer_id = $_SESSION["lecturer_id"];
+        // Initial token (will be quickly replaced by AJAX rotating logic on the active session page)
         $token = bin2hex(random_bytes(16));
         $expiry = date("Y-m-d H:i:s", strtotime("+2 hours"));
 
@@ -56,33 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $session_id = $pdo->lastInsertId();
 
-        include "../phpqrcode/qrlib.php";
-
-            $attendanceURL = "http://localhost/attendance_system/student/mark_attendance.php?session_id=" . $session_id;
-            $viewattendanceURL = "http://localhost/attendance_system/lecturer/view_attendance.php?session_id=" . $session_id; 
-            // Create QR code file
-            $qrFile = "../qrcodes/session_" . $session_id . ".png";
-
-            QRcode::png($attendanceURL, $qrFile, QR_ECLEVEL_L, 5);
-
-            // Display QR
-            $message = "
-                <p>Session created successfully.</p>
-                <p>Scan this QR code:</p>
-                <img src='../qrcodes/session_$session_id.png'><br><br>
-                <p>Or open link:</p>
-                <a href='$attendanceURL'>$attendanceURL</a><br><br>
-                <form method='GET' action='create_session.php'>
-                    <input type='hidden' name='course_id' value='$course_id'>
-                    <input type='hidden' name='end_session_id' value='$session_id'>
-                    <button class='button' type='submit'>End Session and Go to Course Dashboard</button>
-                </form>
-                <p><a class='button' target='_blank' href='$viewattendanceURL'>View Attendance Records</a></p>
-
-            ";
-        }
+        // Redirect to the live active session visualizer!
+        header("Location: active_session.php?session_id=" . $session_id);
+        exit;
+    }
 }
-echo "<script>showToast('Session Created Successfully');</script>";
 ?>
 
 <!DOCTYPE html>
@@ -90,54 +58,82 @@ echo "<script>showToast('Session Created Successfully');</script>";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Session</title>
+    <title>Create Attendance Session - QR Attend</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
 <?php include "navbar.php"; ?>
-<h2>Create Attendance Session</h2>
-<p><?php echo $message; ?></p>
+
 <div class="container">
-    <div class="card">
-            <form method="POST" id="sessionForm"
-                onsubmit="event.preventDefault(); createSession();">
+    <div style="max-width: 600px; margin: 2rem auto;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 2.5rem; color: var(--accent-glow); margin-bottom: 0.5rem;">
+                <i class="fa-solid fa-tower-broadcast"></i>
+            </div>
+            <h2>Create Attendance Session</h2>
+            <p>Start a new session and securely broadcast dynamic QR codes for students.</p>
+        </div>
+        
+        <?php if (!empty($message)): ?>
+            <div class="card" style="text-align: center; border: 1px solid var(--danger); box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); color: var(--danger);">
+                <i class="fa-solid fa-triangle-exclamation"></i> <?php echo $message; ?>
+            </div>
+        <?php endif; ?>
+        
+        <div class="card">
+            <form method="POST" id="sessionForm" onsubmit="event.preventDefault(); createSession();">
                 
                 <input type="hidden" name="lat" id="lat">
                 <input type="hidden" name="lon" id="lon">
                 
-                <label>Allowed Radius (meters):</label><br>
-                <input type="number" name="radius" value="50"><br><br>
+                <label for="radius"><i class="fa-solid fa-map-location-dot" style="margin-right: 5px;"></i> Allowed Radius (meters)</label>
+                <input type="number" name="radius" id="radius" value="50" min="10" required style="margin-top: 0.5rem; margin-bottom: 1rem;">
                 
-                <button class="button" type="submit">Create Session</button>
-        </form>
+                <button class="button button-primary" type="submit" style="width: 100%;">
+                    <i class="fa-solid fa-satellite-dish"></i> Broadcast Session
+                </button>
+                
+                <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-circle-info"></i> Make sure to allow location access when prompted.
+                </div>
+            </form>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <a href="course_dashboard.php?course_id=<?php echo $course_id; ?>" style="color: var(--text-muted);">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
     </div>
 </div>
 
 <script>
     function createSession() {
-
         if (!navigator.geolocation) {
-        alert("Geolocation not supported.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            
-            document.getElementById("lat").value =
-            position.coords.latitude;
-            
-            document.getElementById("lon").value =
-                position.coords.longitude;
-                
-            document.getElementById("sessionForm").submit();
-        },
-        function() {
-            alert("Location access denied.");
+            alert("Geolocation not supported by your browser.");
+            return;
         }
-    );
-}
+
+        const btn = document.querySelector('#sessionForm button[type="submit"]');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Getting Location & Starting...';
+        btn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                document.getElementById("lat").value = position.coords.latitude;
+                document.getElementById("lon").value = position.coords.longitude;
+                document.getElementById("sessionForm").submit();
+            },
+            function(error) {
+                btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Broadcast Session';
+                btn.disabled = false;
+                alert("Location access denied or unavailable. Please enable location services.");
+            },
+            { timeout: 10000, enableHighAccuracy: true }
+        );
+    }
 </script>
 <script src="../assets/js/main.js"></script>
 </body>

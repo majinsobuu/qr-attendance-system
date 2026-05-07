@@ -1,19 +1,50 @@
 <?php
+session_start();
 require_once "../config/db.php";
 
 if (!isset($_GET["session_id"])) {
     die("Invalid session.");
 }
 
-$session_id = $_GET["session_id"];
+$session_id = intval($_GET["session_id"]);
 
 // Fetch session details
-$stmt = $pdo->prepare("SELECT * FROM sessions WHERE session_id = ?");
+$stmt = $pdo->prepare("SELECT * FROM sessions WHERE session_id = ? AND expires_at > NOW()");
 $stmt->execute([$session_id]);
 $session = $stmt->fetch();
 
 if (!$session) {
-    die("Session not found.");
+    die("Session not found or has already expired.");
+}
+
+// Token validation logic (Dynamic Rotating QR)
+$token_valid = false;
+if (isset($_GET['token']) && $_GET['token'] === $session['session_token']) {
+    $token_valid = true;
+    $_SESSION['scanned_valid_for_' . $session_id] = true;
+}
+
+// If token isn't right now valid, and they didn't successfully scan a recent one, block them
+if (!$token_valid && !isset($_SESSION['scanned_valid_for_' . $session_id])) {
+    die(<<<HTML
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Access Denied - QR Attend</title>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </head>
+    <body class="page-center">
+        <div class="card" style="text-align: center; max-width: 400px; padding: 2rem;">
+            <div style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"><i class="fa-solid fa-circle-xmark"></i></div>
+            <h2 style="color: var(--danger);">Expired QR Code</h2>
+            <p style="color: var(--text-muted);">The QR code you scanned is no longer valid. Please scan the live QR code being broadcast by your lecturer right now.</p>
+        </div>
+    </body>
+    </html>
+HTML);
 }
 
 $message = "";
@@ -57,11 +88,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $student_lon
         );
 
-        // Check radius
-        $radius = 30; // meters
+        // Check radius from session
+        $radius = isset($session["radius"]) ? floatval($session["radius"]) : 30; // fallback
 
         if ($distance > $radius) {
-            $message = "You are outside the allowed range.";
+            $message = "You are outside the allowed range ({$radius}m). Your distance: " . round($distance, 1) . "m";
         }
         else {
 
@@ -73,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $checkDevice->execute([$session_id, $device_id]);
 
             if ($checkDevice->rowCount() > 0) {
-                $message = "This device has already registered.";
+                $message = "This device has already registered attendance.";
             }
             else {
 
@@ -101,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $distance
                     ]);
 
-                    $message = "Attendance recorded successfully.";
+                    $message = "Success: Attendance recorded securely.";
                 }
             }
         }
@@ -115,39 +146,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Mark Attendance</title>
+    <title>Mark Attendance - QR Attend</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
+<div class="page-center">
+    <div style="width: 100%; max-width: 450px; text-align: center; margin-bottom: 2rem;">
+        <div style="font-size: 2.5rem; font-weight: 700; color: var(--accent-glow); margin-bottom: 0.5rem; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);">
+            <i class="fa-solid fa-clipboard-user"></i>
+        </div>
+        <h2>Mark Attendance</h2>
+        <p>Please enter your details to register your presence.</p>
+    </div>
 
-<?php if ($message != ""): ?>
-    <p><strong><?php echo $message; ?></strong></p>
-<?php endif; ?>
+    <div class="card" style="width: 100%; max-width: 450px;">
+        <?php if ($message != ""): ?>
+            <?php 
+                $alertColor = (strpos(strtolower($message), 'success') !== false) || (strpos(strtolower($message), 'Success') !== false) ? 'var(--success)' : 'var(--danger)'; 
+                $alertBg = (strpos(strtolower($message), 'success') !== false) || (strpos(strtolower($message), 'Success') !== false) ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+            ?>
+            <div class="badge" style="background: <?php echo $alertBg; ?>; color: <?php echo $alertColor; ?>; text-align: center; margin-bottom: 1.5rem; display: block; padding: 0.8rem;">
+                <i class="fa-solid fa-circle-exclamation"></i> <?php echo $message; ?>
+            </div>
+        <?php endif; ?>
 
-<div class="container">
-    <div class="card">
-<form method="POST" id="attendanceForm" 
-onsubmit="event.preventDefault(); submitAttendance();">
+        <form method="POST" id="attendanceForm" onsubmit="event.preventDefault(); submitAttendance();">
 
-    <input type="text" name="matric" placeholder="Matric Number" required><br><br>
+            <label for="matric"><i class="fa-solid fa-id-card" style="margin-right: 5px;"></i> Matric Number</label>
+            <input type="text" name="matric" id="matric" placeholder="e.g UG/19/2000" required>
 
-    <input type="text" name="student_name" placeholder="Full Name" required><br><br>
+            <label for="student_name" style="margin-top: 0.5rem;"><i class="fa-solid fa-user" style="margin-right: 5px;"></i> Full Name</label>
+            <input type="text" name="student_name" id="student_name" placeholder="John Doe" required>
 
-    <input type="text" name="student_level" placeholder="Level (e.g. 300)" required><br><br>
+            <label for="student_level" style="margin-top: 0.5rem;"><i class="fa-solid fa-layer-group" style="margin-right: 5px;"></i> Level</label>
+            <input type="text" name="student_level" id="student_level" placeholder="e.g. 300" required>
 
-    <input type="hidden" name="lat" id="lat">
-    <input type="hidden" name="lon" id="lon">
-    <input type="hidden" name="device_id" id="device_id">
+            <input type="hidden" name="lat" id="lat">
+            <input type="hidden" name="lon" id="lon">
+            <input type="hidden" name="device_id" id="device_id">
 
-    <button class="button" type="submit">Submit Attendance</button>
-</form>
+            <button class="button button-primary" type="submit" style="margin-top: 1rem; width: 100%;">
+                <i class="fa-solid fa-location-arrow"></i> Submit Attendance
+            </button>
+        </form>
+    </div>
 </div>
-</div>
 
-<script src="../assets/script.js"></script>
+<script src="../assets/js/main.js"></script>
 <script>
 function submitAttendance() {
+
+    const btn = document.querySelector('#attendanceForm button[type="submit"]');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
 
     let deviceId = localStorage.getItem("device_id");
 
@@ -160,6 +213,8 @@ function submitAttendance() {
 
     if (!navigator.geolocation) {
         alert("Geolocation not supported.");
+        btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Submit Attendance';
+        btn.disabled = false;
         return;
     }
 
@@ -175,8 +230,11 @@ function submitAttendance() {
             document.getElementById("attendanceForm").submit();
         },
         function() {
-            alert("Location access denied.");
-        }
+            alert("Location access denied. We need your location to verify your attendance.");
+            btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Submit Attendance';
+            btn.disabled = false;
+        },
+        { enableHighAccuracy: true }
     );
 }
 </script>

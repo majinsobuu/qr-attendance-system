@@ -11,33 +11,7 @@ if (!isset($_SESSION["lecturer_id"])) {
 $message = "";
 $qrPath = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $lat = $_POST["lat"];
-    $lon = $_POST["lon"];
-
-    if (!empty($lat) && !empty($lon)) {
-
-        $token = bin2hex(random_bytes(16));
-        $expiry = date("Y-m-d H:i:s", strtotime("+2 hours"));
-
-        $stmt = $pdo->prepare("INSERT INTO sessions (lecturer_id, session_token, lecturer_lat, lecturer_lon, expires_at) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $_SESSION["lecturer_id"],
-            $token,
-            $lat,
-            $lon,
-            $expiry
-        ]);
-
-        $attendanceURL = "http://192.168.137.1/attendance_system/student/mark_attendance.php?session_id=" . $session_id;
-
-        $qrPath = "../qrcodes/" . $token . ".png";
-        QRcode::png($attendanceURL, $qrPath);
-
-        $message = "Session created successfully.";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -45,35 +19,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard - QR Attend</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <?php include "navbar.php"; ?>
 <div class="container">
-    
-    <h2>Welcome, <?php echo $_SESSION["lecturer_name"]; ?></h2>
-    <div class="card">
-        <a class="button" href="courses.php">Manage Courses</a>
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; margin-top: 2rem;">
+        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);">
+            <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <div>
+            <h1 style="margin-bottom: 0;">Welcome, <?php echo $_SESSION["lecturer_name"]; ?>!</h1>
+            <p style="margin-bottom: 0;">Here is your attendance overview.</p>
+        </div>
     </div>
-<!-- 
-    <form method="POST" id="sessionForm">
-        <input type="hidden" name="lat" id="lat">
-    <input type="hidden" name="lon" id="lon">
-    <button type="button" onclick="createSession()">Create Attendance Session</button>
-</form>
 
-<p><?php echo $message; ?></p>
-
-<?php if ($qrPath != ""): ?>
-    <h3>Scan QR Code:</h3>
-    <img src="<?php echo $qrPath; ?>">
-    <?php endif; ?>
-    -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <div class="card" style="text-align: center; padding: 3rem 2rem;">
+            <div style="font-size: 3rem; color: var(--accent-glow); margin-bottom: 1rem;">
+                <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem;">Manage Courses</h3>
+            <p style="font-size: 0.9rem;">View, add, or edit your courses and generate attendance QR codes.</p>
+            <a class="button button-primary" href="courses.php" style="margin-top: 1rem; width: 100%;"><i class="fa-solid fa-arrow-right"></i> Go to Courses</a>
+        </div>
+        
+        <div class="card" style="text-align: center; padding: 3rem 2rem;">
+            <div style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;">
+                <i class="fa-solid fa-plus-circle"></i>
+            </div>
+            <h3 style="margin-bottom: 0.5rem;">Add New Course</h3>
+            <p style="font-size: 0.9rem;">Create a new course to start tracking student attendance today.</p>
+            <a class="button button-success" href="add_course.php" style="margin-top: 1rem; width: 100%;"><i class="fa-solid fa-plus"></i> Add Course</a>
+        </div>
+    </div>
     
-
-    <br><br>
-<a class="button" href="logout.php">Logout</a>
+    <div style="text-align: center; margin-top: 2rem;">
+        <a class="button button-danger" href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
 </div>
 
 <script>

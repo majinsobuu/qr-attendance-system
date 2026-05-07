@@ -1,0 +1,3 @@
+php_value display_errors On
+php_value date.timezone Africa/Lagos
+Redirect 301 /qr-attendance-system.free.nf https://qr-attendance-system.free.nf/index.php
